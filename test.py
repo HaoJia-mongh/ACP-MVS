@@ -192,7 +192,7 @@ def save_scene_depth(testlist):
         print("wrong data_type")
     TestImgLoader = DataLoader(test_dataset, args.batch_size, shuffle=False, num_workers=1, drop_last=False)
 
-    model = Effi_MVS(args)
+    model = ACP_MVS(args)
     # load checkpoint file specified by args.loadckpt
     print("loading model {}".format(args.loadckpt))
     state_dict = torch.load(args.loadckpt, map_location=torch.device("cpu"))
