@@ -1,30 +1,39 @@
-# ACP-MVS
-This repository contains the source code for our paper:
+# ACP-MVS  
 
-ACP-MVS: Efficient Multi-View Stereo with Attention-based Context Perception
+This repository contains the source code for our paper:  
 
-## Environment
-* NVIDIA RTX 3090
-* python 3.8
-* CUDA >= 11.1
-```
+**ACP-MVS: Efficient Multi-View Stereo with Attention-based Context Perception**  
+
+---
+
+## Environment  
+- **Hardware**: NVIDIA RTX 3090  
+- **Python**: 3.8  
+- **CUDA**: >= 11.1  
+
+To install dependencies, run:  
+```bash
 pip install -r requirements.txt
 ```
 
-## Required Data
-To evaluate/train ACP-MVS, you will need to download the required datasets. 
+## **Required Data**  
+To evaluate or train ACP-MVS, you need to download the required datasets:  
 
-*[DTU's evaluation](https://drive.google.com/file/d/1jN8yEQX0a-S22XwUjISM8xSJD39pFLL_/view?usp=sharing)
-
-*[DTU's training](https://drive.google.com/file/d/1eDjh-_bxKKnEuz5h-HXS7EDJn59clx6V/view)
-
-*[Tanks and Temples](https://drive.google.com/file/d/1gAfmeoGNEFl9dL4QcAU4kF0BAyTd-r8Z/view?usp=sharing)
-
-*[BlendedMVS](https://1drv.ms/u/s!Ag8Dbz2Aqc81gVDgxb8MDGgoV74S?e=hJKlvV)
+- [DTU Evaluation Set](https://drive.google.com/file/d/1jN8yEQX0a-S22XwUjISM8xSJD39pFLL_/view?usp=sharing)  
+- [DTU Training Set](https://drive.google.com/file/d/1eDjh-_bxKKnEuz5h-HXS7EDJn59clx6V/view)  
+- [Tanks and Temples](https://drive.google.com/file/d/1gAfmeoGNEFl9dL4QcAU4kF0BAyTd-r8Z/view?usp=sharing)  
+- [BlendedMVS](https://1drv.ms/u/s!Ag8Dbz2Aqc81gVDgxb8MDGgoV74S?e=hJKlvV)  
 
 
-## Reproducing Results
-* Download pre-processed datasets (provided by PatchmatchNet): [DTU's evaluation set](https://drive.google.com/file/d/1jN8yEQX0a-S22XwUjISM8xSJD39pFLL_/view?usp=sharing), [Tanks & Temples](https://drive.google.com/file/d/1gAfmeoGNEFl9dL4QcAU4kF0BAyTd-r8Z/view?usp=sharing)
+## **Reproducing Results**  
+
+### **Dataset Structure**  
+Download the preprocessed datasets (provided by PatchmatchNet):  
+
+- [DTU Evaluation Set](https://drive.google.com/file/d/1jN8yEQX0a-S22XwUjISM8xSJD39pFLL_/view?usp=sharing)  
+- [Tanks and Temples](https://drive.google.com/file/d/1gAfmeoGNEFl9dL4QcAU4kF0BAyTd-r8Z/view?usp=sharing)  
+
+The dataset directory structure should be as follows:  
 ```
 root_directory
 ├──scan1 (scene_name1)
@@ -40,7 +49,10 @@ root_directory
       └── pair.txt  
 ```
 
-Camera file ``cam.txt`` stores the camera parameters, which includes extrinsic, intrinsic, minimum depth and maximum depth:
+## **File Descriptions**  
+
+### **Camera File (`cam.txt`)**  
+Stores camera parameters, including extrinsics, intrinsics, minimum depth, and maximum depth:
 ```
 extrinsic
 E00 E01 E02 E03
@@ -55,73 +67,116 @@ K20 K21 K22
 
 DEPTH_MIN DEPTH_MAX 
 ```
-``pair.txt `` stores the view selection result. For each reference image, 10 best source views are stored in the file:
+
+### **View Selection File (`pair.txt`)**  
+Stores the best 10 source views for each reference image:  
+
 ```
 TOTAL_IMAGE_NUM
-IMAGE_ID0                       # index of reference image 0 
+IMAGE_ID0                       # Reference image 0 index
 10 ID0 SCORE0 ID1 SCORE1 ...    # 10 best source images for reference image 0 
-IMAGE_ID1                       # index of reference image 1
+IMAGE_ID1                       # Reference image 1 index
 10 ID0 SCORE0 ID1 SCORE1 ...    # 10 best source images for reference image 1 
 ...
 ``` 
 
+## **Evaluation**  
 
-### Evaluation on DTU:
-* In ``test.sh``, set `DTU_TESTING`, or `TANK_TESTING` as the root directory of corresponding dataset, set `--OUT_DIR` as the directory to store the reconstructed point clouds, uncomment the evaluation command for corresponding dataset (default is to evaluate on DTU's evaluation set).
-* `CKPT_FILE` is the checkpoint file (our pretrained model is `checkpoints/DTU.ckpt`). 
-* Test on GPU by running `sh test.sh`. The code includes depth map estimation and depth fusion. The outputs are the point clouds in `ply` format. 
-* For quantitative evaluation, download [SampleSet](http://roboimagedata.compute.dtu.dk/?page_id=36) and [Points](http://roboimagedata.compute.dtu.dk/?page_id=36) from DTU's website. Unzip them and place `Points` folder in `SampleSet/MVS Data/`. The structure looks like:
+### **Evaluation on DTU**  
+1. In `test.sh`, set `DTU_TESTING` as the root directory of the corresponding dataset.  
+2. Set `--OUT_DIR` as the directory to store the reconstructed point clouds.  
+3. Uncomment the evaluation command for the desired dataset (default is DTU).  
+4. Set `CKPT_FILE` to the checkpoint file (`checkpoints/DTU.ckpt` for our pretrained model).  
+5. Run the evaluation on GPU using:  
+```bash
+sh test.sh
 ```
+The code will generate depth maps and perform depth fusion. The outputs are point clouds in `.ply` format.
+
+6. For quantitative evaluation, download [SampleSet](http://roboimagedata.compute.dtu.dk/?page_id=36) and [Points](http://roboimagedata.compute.dtu.dk/?page_id=36) from the DTU website. Extract the `Points` folder into `SampleSet/MVS Data/`, ensuring the structure is:
+```plaintext
 SampleSet
-├──MVS Data
-      └──Points
+├── MVS Data
+    └── Points
 ```
-In ``evaluations/dtu/BaseEvalMain_web.m``, set `dataPath` as the path to `SampleSet/MVS Data/`, `plyPath` as directory that stores the reconstructed point clouds and `resultsPath` as directory to store the evaluation results. Then run ``evaluations/dtu/BaseEvalMain_web.m`` in matlab.
+7. In `evaluations/dtu/BaseEvalMain_web.m`, set:
 
-The results look like:
+- `dataPath` → path to `SampleSet/MVS Data/`
+- `plyPath` → directory storing the reconstructed point clouds
+- `resultsPath` → directory to store evaluation results
 
+8. Run `evaluations/dtu/BaseEvalMain_web.m` in MATLAB.
 
-| Acc. (mm) | Comp. (mm) | Overall (mm) |
-|-----------|------------|--------------|
-| 0.315     | 0.285      | 0.300        |
+### **Evaluation Results (DTU)**
 
-
-### Evaluation on Tansk and Temples:
-* In ``test.sh``, set `TANK_TESTING` as the root directory of the dataset and `--outdir` as the directory to store the reconstructed point clouds. 
-* `CKPT_FILE` is the path of checkpoint file (our pretrained model is `checkpoints/TANK_train_on_dtu.ckpt`). We also provide our pretrained model trained on BlendedMVS (`checkpoints/TANK_train_on_blendedmvs.ckpt`)
-* Test on GPU by running `sh test.sh`. The code includes depth map estimation and depth fusion. The outputs are the point clouds in `ply` format. 
-
-
-TANK on DTU(mean F-score)
-| intermediate | advanced (mm) |
-|------------- |-------------- |
-| 59.81        | 37.41         |
+| Accuracy (mm) | Completeness (mm) | Overall (mm) |
+|---------------|-------------------|--------------|
+| 0.315         | 0.285             | 0.300        |
 
 
-TANK on blendedmvs(mean F-score)
-| intermediate | advanced (mm) |
-|------------- |-------------- |
-| 64.70        | 41.72         |
+
+### **Evaluation on Tanks and Temples**
+
+1. In `test.sh`, set `TANK_TESTING` as the dataset root directory.  
+2. Set `--outdir` as the directory for the reconstructed point clouds.  
+3. Specify the checkpoint file:  
+   - `checkpoints/TANK_train_on_dtu.ckpt` (trained on DTU)  
+   - `checkpoints/TANK_train_on_blendedmvs.ckpt` (trained on BlendedMVS)  
+4. Run the evaluation on GPU using:  
+```bash
+sh test.sh
+```
+The code will generate depth maps and perform depth fusion. The outputs are point clouds in `.ply` format.
 
 
-## Training
+### **Evaluation Results**
+
+#### **DTU-trained Model (Mean F-score)**
+
+| Level        | Intermediate | Advanced |
+|--------------|--------------|----------|
+| **F-score**  | 59.81        | 37.41    |
+
+#### **BlendedMVS-trained Model (Mean F-score)**
+
+| Level        | Intermediate | Advanced |
+|--------------|--------------|----------|
+| **F-score**  | 64.70        | 41.72    |
 
 
-### DTU
-* Download the preprocessed [DTU training data](https://drive.google.com/file/d/1eDjh-_bxKKnEuz5h-HXS7EDJn59clx6V/view)
+### **Training**
+
+#### **Training on DTU**
+
+1. Download the preprocessed [DTU training data](https://drive.google.com/file/d/1eDjh-_bxKKnEuz5h-HXS7EDJn59clx6V/view)
  and [Depths_raw](https://virutalbuy-public.oss-cn-hangzhou.aliyuncs.com/share/cascade-stereo/CasMVSNet/dtu_data/dtu_train_hr/Depths_raw.zip) 
- (both from [Original MVSNet](https://github.com/YoYo000/MVSNet)), and upzip it as the $MVS_TRANING  folder.
-* In ``train.sh``, set `MVS_TRAINING` as the root directory of dataset; set `--logdir` as the directory to store the checkpoints. 
-* Train the model by running `sh train.sh`.
+ (both from [Original MVSNet](https://github.com/YoYo000/MVSNet)) (from [Original MVSNet](https://github.com/YoYo000/MVSNet)).
+2. Extract them into `$MVS_TRAINING`.
+3. In `train.sh`, set `MVS_TRAINING` as the dataset root directory.
+4. Set `--logdir` as the directory to store checkpoints.
+5. Train the model by running:
+```bash
+sh train.sh
+```
 
 
-### BlendedMVS
-* Download the [BlendedMVS dataset](https://1drv.ms/u/s!Ag8Dbz2Aqc81gVDgxb8MDGgoV74S?e=hJKlvV).
-* In ``train.sh``, set `MVS_TRAINING` as the root directory of dataset; set `--logdir` as the directory to store the checkpoints. 
-* Train the model by running `sh train.sh`.
+#### **Training on BlendedMVS**
 
+1. Download the [BlendedMVS dataset](https://1drv.ms/u/s!Ag8Dbz2Aqc81gVDgxb8MDGgoV74S?e=hJKlvV).
+2. In `train.sh`, set `MVS_TRAINING` as the dataset root directory.
+3. Set `--logdir` as the directory to store checkpoints.
+4. Train the model by running:
 
+```bash
+sh train.sh
+```
 
-# Acknowledgements
-This project is based on [MVSNet-pytorch](https://github.com/xy-guo/MVSNet_pytorch), [Effi-MVS](https://github.com/bdwsq1996/Effi-MVS). We thank the original authors for their excellent works.
+### **Acknowledgements**
+
+This project is based on:
+
+- [MVSNet-pytorch](https://github.com/xy-guo/MVSNet_pytorch)
+- [Effi-MVS](https://github.com/bdwsq1996/Effi-MVS)
+
+We thank the original authors for their excellent work.
 
