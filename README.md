@@ -86,7 +86,7 @@ IMAGE_ID1                       # Reference image 1 index
 1. In `test.sh`, set `DTU_TESTING` as the root directory of the corresponding dataset.  
 2. Set `--OUT_DIR` as the directory to store the reconstructed point clouds.  
 3. Uncomment the evaluation command for the desired dataset (default is DTU).  
-4. Set `CKPT_FILE` to the checkpoint file (`checkpoints/DTU.ckpt` for our pretrained model).  
+4. Set `CKPT_FILE` to the checkpoint file.  
 5. Run the evaluation on GPU using:  
 ```bash
 sh test.sh
@@ -119,9 +119,7 @@ SampleSet
 
 1. In `test.sh`, set `TANK_TESTING` as the dataset root directory.  
 2. Set `--outdir` as the directory for the reconstructed point clouds.  
-3. Specify the checkpoint file:  
-   - `checkpoints/TANK_train_on_dtu.ckpt` (trained on DTU)  
-   - `checkpoints/TANK_train_on_blendedmvs.ckpt` (trained on BlendedMVS)  
+3. Specify the checkpoint file. 
 4. Run the evaluation on GPU using:  
 ```bash
 sh test.sh
